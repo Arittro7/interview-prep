@@ -1,18 +1,18 @@
 /* eslint-disable react-hooks/set-state-in-effect */
 
-import React, { useState, useRef, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { useInterview } from '../context/InterviewContext';
-import { Button } from './ui/button';
+import React, { useState, useRef, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import { useInterview } from "../context/InterviewContext";
+import { Button } from "./ui/button";
 import {
   Card,
   CardHeader,
   CardTitle,
   CardContent,
   CardFooter,
-} from './ui/card';
-import CameraRecorder from './CameraRecorder';
-import AIAnswer from './AIAnswer';
+} from "./ui/card";
+import CameraRecorder from "./CameraRecorder";
+import AIAnswer from "./AIAnswer";
 
 const Interview = () => {
   const {
@@ -37,44 +37,41 @@ const Interview = () => {
   const formatTime = (seconds) => {
     const min = Math.floor(seconds / 60);
     const sec = seconds % 60;
-    return `${min}:${sec < 10 ? '0' : ''}${sec}`;
-  };
-
-  const handleEndInterview = () => {
-    // Stop video recording
-    if (cameraRef.current) {
-      cameraRef.current.stopRecording();
-    }
-
-    endInterview();     // Reset context state
-    navigate('/');      // Go back to home
+    return `${min}:${sec < 10 ? "0" : ""}${sec}`;
   };
 
   const handleRecordingComplete = (blob) => {
-    if (!blob || blob.size === 0) {
-      console.warn('Recording was empty – no file saved');
-      // Optional: show user message
-      // alert('No recording was captured. Check camera/mic permissions.');
+    console.log("handleRecordingComplete called. Blob size:", blob?.size);
+
+    if (!blob || blob.size < 1024) {
+      // <1KB likely empty – adjust threshold
+      console.warn("Recording was empty or too small – no file saved");
       return;
     }
 
     const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.style.display = 'none';
+    const a = document.createElement("a");
+    a.style.display = "none";
     a.href = url;
-
-    // Nice filename with date & time
-    const dateStr = new Date().toISOString().slice(0, 19).replace(/[:T]/g, '-');
-    a.download = `interview-recording-${dateStr}.webm`;
-
+    a.download = `interview-recording-${new Date().toISOString().slice(0, 19).replace(/[:T]/g, "-")}.webm`;
     document.body.appendChild(a);
     a.click();
 
-    // Clean up
     setTimeout(() => {
       document.body.removeChild(a);
       URL.revokeObjectURL(url);
     }, 100);
+  };
+
+  const handleEndInterview = () => {
+    if (cameraRef.current) {
+      cameraRef.current.stopRecording();
+    }
+
+    setTimeout(() => {
+      endInterview();
+      navigate("/");
+    }, 500);
   };
 
   // ─────────────────────────────────────────────────────────────
@@ -85,15 +82,14 @@ const Interview = () => {
       <div className="flex flex-col items-center justify-center min-h-screen p-6 text-center">
         <h2 className="text-2xl font-bold mb-4">No Questions Available</h2>
         <p className="text-muted-foreground mb-6 max-w-md">
-          It looks like there are no questions in the database yet, or none match your selected tags.
+          It looks like there are no questions in the database yet, or none
+          match your selected tags.
         </p>
         <div className="flex gap-4">
-          <Button variant="outline" onClick={() => navigate('/add-question')}>
+          <Button variant="outline" onClick={() => navigate("/add-question")}>
             Add a Question
           </Button>
-          <Button onClick={handleEndInterview}>
-            Back to Home
-          </Button>
+          <Button onClick={handleEndInterview}>Back to Home</Button>
         </div>
       </div>
     );
@@ -105,11 +101,7 @@ const Interview = () => {
     <div className="container max-w-7xl mx-auto p-4 md:p-6 lg:p-8">
       {/* Top bar */}
       <div className="flex justify-end mb-6">
-        <Button
-          variant="destructive"
-          size="sm"
-          onClick={handleEndInterview}
-        >
+        <Button variant="destructive" size="sm" onClick={handleEndInterview}>
           End Interview
         </Button>
       </div>
@@ -122,9 +114,7 @@ const Interview = () => {
             <div className="text-4xl font-mono font-bold tracking-wider mb-1">
               {formatTime(timer)}
             </div>
-            <div className="text-sm text-muted-foreground">
-              Time Elapsed
-            </div>
+            <div className="text-sm text-muted-foreground">Time Elapsed</div>
           </div>
 
           {/* Camera preview */}
@@ -154,11 +144,11 @@ const Interview = () => {
               </div>
 
               <Button
-                variant={isMarked ? 'default' : 'outline'}
+                variant={isMarked ? "default" : "outline"}
                 size="sm"
                 onClick={() => toggleMarkQuestion(currentQuestion.id)}
               >
-                {isMarked ? 'Marked ✓' : 'Mark for Review'}
+                {isMarked ? "Marked ✓" : "Mark for Review"}
               </Button>
             </CardHeader>
 
@@ -185,13 +175,10 @@ const Interview = () => {
                 size="lg"
                 onClick={() => setIsAnswerRevealed(!isAnswerRevealed)}
               >
-                {isAnswerRevealed ? 'Hide Answer' : 'Reveal Answer'}
+                {isAnswerRevealed ? "Hide Answer" : "Reveal Answer"}
               </Button>
 
-              <Button
-                size="lg"
-                onClick={nextQuestion}
-              >
+              <Button size="lg" onClick={nextQuestion}>
                 Next Question →
               </Button>
             </CardFooter>

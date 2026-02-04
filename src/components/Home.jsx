@@ -24,7 +24,10 @@ const Home = () => {
 
   return (
     <div className="container max-w-3xl mx-auto flex flex-col items-center min-h-[80vh] p-6">
-      <div className="w-full flex justify-end mb-6">
+      <div className="w-full flex justify-between mb-6">
+        <Button variant="outline" onClick={() => navigate("/questions")}>
+          View All Questions
+        </Button>
         <Button variant="outline" onClick={() => navigate("/add-question")}>
           + Add New Question
         </Button>
