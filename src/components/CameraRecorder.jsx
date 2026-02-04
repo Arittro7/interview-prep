@@ -13,7 +13,7 @@ const CameraRecorder = forwardRef(({ onRecordingComplete }, ref) => {
     status,         
   } = useReactMediaRecorder({
     video: true,
-    audio: false,  
+    audio: true,  
     blobPropertyBag: { type: 'video/webm' },
     onStop: (blobUrl, blob) => {
       console.log('Recording stopped. Status:', status, 'Blob size:', blob.size);
